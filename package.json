@@ -1,0 +1,39 @@
+{
+  "name": "displayotron",
+  "version": "0.0.1",
+  "description": "Native node library to use Pimoroni's Display-O-Tron HATs",
+  "main": "index.js",
+  "scripts": {
+    "test": "node scripts/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fmauNeko/node-displayotron.git"
+  },
+  "keywords": [
+    "raspberry",
+    "pi",
+    "displayotron",
+    "pimoroni",
+    "lcd",
+    "button",
+    "rgb"
+  ],
+  "author": "Florian \"fmauNeko\" Maunier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fmauNeko/node-displayotron/issues"
+  },
+  "homepage": "https://github.com/fmauNeko/node-displayotron#readme",
+  "dependencies": {
+    "i2c": "^0.2.3",
+    "rpio": "^0.9.12",
+    "spi": "^0.2.0"
+  },
+  "devDependencies": {
+    "debug": "^2.3.3",
+    "jasmine": "^2.5.2",
+    "jasmine-console-reporter": "^1.2.7",
+    "jasmine-reporters": "^2.2.0"
+  }
+}
