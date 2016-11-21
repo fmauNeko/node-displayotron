@@ -4,7 +4,7 @@
   "description": "Native node library to use Pimoroni's Display-O-Tron HATs",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/test.js"
+    "test": "babel-node scripts/test.js | tap-diff"
   },
   "repository": {
     "type": "git",
@@ -31,9 +31,15 @@
     "spi": "^0.2.0"
   },
   "devDependencies": {
-    "debug": "^2.3.3",
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0",
     "jasmine": "^2.5.2",
-    "jasmine-console-reporter": "^1.2.7",
-    "jasmine-reporters": "^2.2.0"
+    "jasmine-reporters": "^2.2.0",
+    "tap-diff": "^0.1.1"
+  },
+  "babel": {
+    "presets": [
+      "latest"
+    ]
   }
 }
