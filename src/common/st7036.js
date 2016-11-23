@@ -30,7 +30,7 @@ export class ST7036 {
     this.doubleHeight = 0;
     this.animations = new Array(8).fill(null);
 
-    this.spi = Spi('/dev/spidev0.' + spiChipSelect, {
+    this.spi = new Spi('/dev/spidev0.' + spiChipSelect, {
       'maxSpeed': 1000000
     }, function(s) {
       s.open();
@@ -76,7 +76,7 @@ export class ST7036 {
   }
 
   updateDisplayMode() {
-    command = COMMAND_SET_DISPLAY_MODE;
+    let command = COMMAND_SET_DISPLAY_MODE;
     command |= this.enabled
       ? DISPLAY_ON
       : 0;
@@ -86,6 +86,7 @@ export class ST7036 {
     command |= this.cursorBlink
       ? BLINK_ON
       : 0;
+    this._writeCommand(command);
   }
 
   enableCursor(cursor = false) {
@@ -109,7 +110,7 @@ export class ST7036 {
 
     let offset = this.rowOffsets[row] + column;
     this._writeCommand(0b10000000 | offset);
-    await _sleep(1.5);
+    await this._sleep(1.5);
   }
 
   home() {
@@ -118,12 +119,16 @@ export class ST7036 {
 
   async clear() {
     this._writeCommand(COMMAND_CLEAR);
-    await _sleep(1.5);
+    await this._sleep(1.5);
     this.home();
   }
 
   write(value) {
-
+    rpio.write(this.registerSelectPin, rpio.HIGH);
+    [...value].forEach(async (chr) => {
+      this.spi.write(new Buffer([chr.charCodeAt()]));
+      await this._sleep(0.05);
+    });
   }
 
   createAnimation(animPos, animMap, frameRate) {
@@ -162,12 +167,17 @@ export class ST7036 {
 
   }
 
-  _writeInstructionSet(instructionSet = 0) {
-
+  async _writeInstructionSet(instructionSet = 0) {
+    rpio.write(this.registerSelectPin, rpio.LOW);
+    this.spi.write(new Buffer([this.instructionSetTemplate | instructionSet | (this.doubleHeight << 2)]));
+    await this._sleep(0.06);
   }
 
-  _writeCommand(value, instructionSet = 0) {
-
+  async _writeCommand(value, instructionSet = 0) {
+    rpio.write(this.registerSelectPin, rpio.LOW);
+    this._writeInstructionSet(instructionSet);
+    this.spi.write(new Buffer([value]));
+    await this._sleep(0.06);
   }
 
   _sleep(ms) {
