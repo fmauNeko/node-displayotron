@@ -128,7 +128,7 @@ export class ST7036 {
     [...value].forEach((chr) => {
       let buf = Buffer.from([chr.charCodeAt()]);
       this.spi.transferSync([{
-	byteLength: buf.length,
+        byteLength: buf.length,
         sendBuffer: buf
       }]);
       rpio.usleep(0.05);
@@ -136,39 +136,83 @@ export class ST7036 {
   }
 
   createAnimation(animPos, animMap, frameRate) {
+    if (animPos < 0 || animPos >= this.animations.length) {
+      throw new RangeError("Valid animation positions are 0 to " + (this.animations.length - 1).toString());
+    }
 
+    if (!Array.isArray(animMap)) {
+      throw new TypeError("Animation map should be a list of animation frames");
+    }
+
+    if (!Array.isArray(animMap[0])) {
+      throw new TypeError("Animation frames should be lists of 8 bytes");
+    }
+
+    if (animMap[0].length < 8) {
+      throw new RangeError("Animation frames should be lists of 8 bytes");
+    }
+
+    this.createChar(animPos, animMap[0]);
+    this.animations[animPos] = [animMap, frameRate];
+    this.setCursorPosition(0, 1);
   }
 
   updateAnimations() {
-
+    this.animations.forEach((animation, i) => {
+      if (animation !== null && animation.length === 2) {
+        let anim = animation[0];
+        let fps = animation[1];
+        let frame = anim[Math.trunc(Math.round(Date.now() / 1000 * fps) % anim.length)]
+        this.createChar(i, frame);
+      }
+    });
+    this.setCursorPosition(0, 1);
   }
 
   createChar(charPos, charMap) {
+    if (charPos < 0 || charPos > 7) {
+      return false;
+    }
 
+    let baseAddress = charPos * 8;
+    for(let i = 0; i < 8; i++) {
+      this._writeCommand(0x40 | (baseAddress + i));
+      this._writeChar(charMap[i]);
+    }
+
+    this.setDisplayMode();
   }
 
   cursorLeft() {
-
+    this._writeCommand(COMMAND_SCROLL);
   }
 
   cursorRight() {
-
+    this._writeCommand(COMMAND_SCROLL | (1 << 2));
   }
 
   shiftLeft() {
-
+    this._writeCommand(COMMAND_SCROLL | (1 << 3));
   }
 
   shiftRight() {
-
+    this._writeCommand(COMMAND_SCROLL | (1 << 3) | (1 << 2));
   }
 
   doubleHeight(enable = 0, position = 1) {
-
+    this.doubleHeight = enable;
+    this._writeInstructionSet(0);
+    this._writeCommand(COMMAND_DOUBLE | (position << 3), 2);
   }
 
   _writeChar(value) {
-
+    rpio.write(this.registerSelectPin, rpio.HIGH);
+    let buf = Buffer.from([value]);
+    this.spi.transferSync([{
+      byteLength: buf.length,
+      sendBuffer: buf
+    }]);
+    rpio.usleep(0.1);
   }
 
   _writeInstructionSet(instructionSet = 0) {
@@ -185,7 +229,6 @@ export class ST7036 {
     rpio.write(this.registerSelectPin, rpio.LOW);
     this._writeInstructionSet(instructionSet);
     let buf = Buffer.from([value]);
-	  debug(buf);
     this.spi.transferSync([{
       byteLength: buf.length,
       sendBuffer: buf
