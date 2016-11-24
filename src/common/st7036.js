@@ -1,5 +1,8 @@
 import rpio from "rpio";
-import {Spi} from "spi";
+import SPI from "spi-device";
+import dbg from "debug";
+
+const debug = dbg('dot:st7036');
 
 export const COMMAND_CLEAR = 0b00000001
 export const COMMAND_HOME = 0b00000010
@@ -30,15 +33,12 @@ export class ST7036 {
     this.doubleHeight = 0;
     this.animations = new Array(8).fill(null);
 
-    this.spi = new Spi('/dev/spidev0.' + spiChipSelect, {
-      'maxSpeed': 1000000
-    }, function(s) {
-      s.open();
-    });
+    this.spi = SPI.openSync(0, spiChipSelect, {maxSpeedHz: 1000000});
 
     if (this.resetPin !== null) {
       rpio.open(this.resetPin, rpio.OUTPUT, rpio.LOW);
-      setTimeout(() => rpio.write(this.resetPin, rpio.HIGH), 1);
+      rpio.usleep(1);
+      rpio.write(this.resetPin, rpio.HIGH);
     }
 
     rpio.open(this.registerSelectPin, rpio.OUTPUT, rpio.HIGH);
@@ -110,7 +110,7 @@ export class ST7036 {
 
     let offset = this.rowOffsets[row] + column;
     this._writeCommand(0b10000000 | offset);
-    await this._sleep(1.5);
+    rpio.usleep(1.5);
   }
 
   home() {
@@ -119,15 +119,19 @@ export class ST7036 {
 
   async clear() {
     this._writeCommand(COMMAND_CLEAR);
-    await this._sleep(1.5);
+    rpio.usleep(1.5)
     this.home();
   }
 
   write(value) {
     rpio.write(this.registerSelectPin, rpio.HIGH);
     [...value].forEach(async (chr) => {
-      this.spi.write(new Buffer([chr.charCodeAt()]));
-      await this._sleep(0.05);
+      let buf = Buffer.from([chr.charCodeAt()]);
+      this.spi.transferSync([{
+	byteLength: buf.length,
+        sendBuffer: buf
+      }]);
+      rpio.usleep(0.05);
     });
   }
 
@@ -169,18 +173,23 @@ export class ST7036 {
 
   async _writeInstructionSet(instructionSet = 0) {
     rpio.write(this.registerSelectPin, rpio.LOW);
-    this.spi.write(new Buffer([this.instructionSetTemplate | instructionSet | (this.doubleHeight << 2)]));
-    await this._sleep(0.06);
+    let buf = Buffer.from([this.instructionSetTemplate | instructionSet | (this.doubleHeight << 2)]);
+    this.spi.transferSync([{
+      byteLength: buf.length,
+      sendBuffer: buf
+    }]);
+    rpio.usleep(0.06);
   }
 
   async _writeCommand(value, instructionSet = 0) {
     rpio.write(this.registerSelectPin, rpio.LOW);
     this._writeInstructionSet(instructionSet);
-    this.spi.write(new Buffer([value]));
-    await this._sleep(0.06);
-  }
-
-  _sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    let buf = Buffer.from([value]);
+	  debug(buf);
+    this.spi.transferSync([{
+      byteLength: buf.length,
+      sendBuffer: buf
+    }]);
+    rpio.usleep(0.06);
   }
 }
