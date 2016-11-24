@@ -103,7 +103,7 @@ export class ST7036 {
     this._writeCommand(0b10000000 | offset);
   }
 
-  async setCursorPosition(column, row) {
+  setCursorPosition(column, row) {
     if (column < 0 || column > this.columns || row < 0 || row > this.rows) {
       throw new RangeError("row and column must integers within the defined screen size");
     }
@@ -117,7 +117,7 @@ export class ST7036 {
     this.setCursorPosition(0, 0);
   }
 
-  async clear() {
+  clear() {
     this._writeCommand(COMMAND_CLEAR);
     rpio.usleep(1.5)
     this.home();
@@ -125,7 +125,7 @@ export class ST7036 {
 
   write(value) {
     rpio.write(this.registerSelectPin, rpio.HIGH);
-    [...value].forEach(async (chr) => {
+    [...value].forEach((chr) => {
       let buf = Buffer.from([chr.charCodeAt()]);
       this.spi.transferSync([{
 	byteLength: buf.length,
@@ -171,7 +171,7 @@ export class ST7036 {
 
   }
 
-  async _writeInstructionSet(instructionSet = 0) {
+  _writeInstructionSet(instructionSet = 0) {
     rpio.write(this.registerSelectPin, rpio.LOW);
     let buf = Buffer.from([this.instructionSetTemplate | instructionSet | (this.doubleHeight << 2)]);
     this.spi.transferSync([{
@@ -181,7 +181,7 @@ export class ST7036 {
     rpio.usleep(0.06);
   }
 
-  async _writeCommand(value, instructionSet = 0) {
+  _writeCommand(value, instructionSet = 0) {
     rpio.write(this.registerSelectPin, rpio.LOW);
     this._writeInstructionSet(instructionSet);
     let buf = Buffer.from([value]);

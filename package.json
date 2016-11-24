@@ -43,9 +43,6 @@
   "babel": {
     "presets": [
       "latest"
-    ],
-    "plugins": [
-      "transform-async-to-generator"
     ]
   }
 }
