@@ -4,12 +4,11 @@
   "description": "Native node library to use Pimoroni's Display-O-Tron HATs",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/test.js"
+    "test": "babel-node scripts/test.js | tap-diff",
+    "transpile": "babel -d lib src",
+    "prepublish": "npm run transpile"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fmauNeko/node-displayotron.git"
-  },
+  "repository": "fmauNeko/node-displayotron",
   "keywords": [
     "raspberry",
     "pi",
@@ -19,21 +18,28 @@
     "button",
     "rgb"
   ],
-  "author": "Florian \"fmauNeko\" Maunier",
+  "author": "Florian 'fmauNeko' Maunier <fmaunier@gmail.com> (https://www.dissidence.ovh)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/fmauNeko/node-displayotron/issues"
   },
   "homepage": "https://github.com/fmauNeko/node-displayotron#readme",
   "dependencies": {
-    "i2c": "^0.2.3",
+    "debug": "^2.3.3",
+    "i2c-bus": "^1.1.2",
     "rpio": "^0.9.12",
-    "spi": "^0.2.0"
+    "spi-device": "^0.2.4"
   },
   "devDependencies": {
-    "debug": "^2.3.3",
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0",
     "jasmine": "^2.5.2",
-    "jasmine-console-reporter": "^1.2.7",
-    "jasmine-reporters": "^2.2.0"
+    "jasmine-reporters": "^2.2.0",
+    "tap-diff": "^0.1.1"
+  },
+  "babel": {
+    "presets": [
+      "latest"
+    ]
   }
 }
