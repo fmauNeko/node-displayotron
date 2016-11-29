@@ -16,17 +16,17 @@ export class SN3218 {
 
   enable() {
     let buf = Buffer.from([0x01]);
-    this.i2c.writeBlockSync(this.i2cAddr, 0x00, buf.length, buf);
+    this.i2c.writeI2cBlockSync(this.i2cAddr, 0x00, buf.length, buf);
   }
 
   disable() {
     let buf = Buffer.from([0x00]);
-    this.i2c.writeBlockSync(this.i2cAddr, 0x00, buf.length, buf);
+    this.i2c.writeI2cBlockSync(this.i2cAddr, 0x00, buf.length, buf);
   }
 
   reset() {
     let buf = Buffer.from([0xFF]);
-    this.i2c.writeBlockSync(this.i2cAddr, 0x17, buf.length, buf);
+    this.i2c.writeI2cBlockSync(this.i2cAddr, 0x17, buf.length, buf);
   }
 
   enableLeds(enableMask) {
@@ -35,10 +35,10 @@ export class SN3218 {
     }
 
     let buf = Buffer.from([enableMask & 0x3F, (enableMask >> 6) & 0x3F, (enableMask >> 12) & 0x3F]);
-    this.i2c.writeBlockSync(this.i2cAddr, 0x13, buf.length, buf);
+    this.i2c.writeI2cBlockSync(this.i2cAddr, 0x13, buf.length, buf);
 
     buf = Buffer.from([0xFF]);
-    this.i2c.writeBlockSync(this.i2cAddr, 0x16, buf.length, buf);
+    this.i2c.writeI2cBlockSync(this.i2cAddr, 0x16, buf.length, buf);
   }
 
   channelGamma(channel, gammaTable) {
@@ -58,15 +58,15 @@ export class SN3218 {
   }
 
   output(values) {
-    if (!Array.isArray(values) || gammaTable.length !== 18) {
+    if (!Array.isArray(values) || values.length !== 18) {
       throw new TypeError('values must be an array of 18 numbers');
     }
 
-    let buf = Buffer.from([...Array(18).keys()].map(i => channelGammaTable[i][values[i]]));
-    this.i2c.writeBlockSync(this.i2cAddr, 0x01, buf.length, buf);
+    let buf = Buffer.from([...Array(18).keys()].map(i => this.channelGammaTable[i][values[i]]));
+    this.i2c.writeI2cBlockSync(this.i2cAddr, 0x01, buf.length, buf);
 
     buf = Buffer.from([0xFF]);
-    this.i2c.writeBlockSync(this.i2cAddr, 0x16, buf.length, buf);
+    this.i2c.writeI2cBlockSync(this.i2cAddr, 0x16, buf.length, buf);
   }
 
   _i2cBusId() {
