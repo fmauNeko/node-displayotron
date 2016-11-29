@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "babel-node scripts/test.js | tap-diff",
-    "compile": "babel -d lib src",
-    "prepublish": "npm run compile"
+    "transpile": "babel -d lib src",
+    "prepublish": "npm run transpile"
   },
   "repository": "fmauNeko/node-displayotron",
   "keywords": [
@@ -18,7 +18,7 @@
     "button",
     "rgb"
   ],
-  "author": "Florian \"fmauNeko\" Maunier",
+  "author": "Florian 'fmauNeko' Maunier <fmaunier@gmail.com> (https://www.dissidence.ovh)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/fmauNeko/node-displayotron/issues"
