@@ -4,7 +4,7 @@ import fs from 'fs';
 
 const debug = dbg('dot:common:sn3218');
 
-export class SN3218 {
+export default class SN3218 {
   constructor() {
     this.i2c = i2cBus.openSync(this._i2cBusId());
     this.i2cAddr = 0x54;

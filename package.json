@@ -4,9 +4,10 @@
   "description": "Native node library to use Pimoroni's Display-O-Tron HATs",
   "main": "index.js",
   "scripts": {
-    "test": "babel-node scripts/test.js | tap-diff",
-    "transpile": "babel -d lib src",
-    "prepublish": "npm run transpile"
+    "prepublish": "npm run transpile",
+    "test": "xo && babel-node scripts/test.js | tap-diff",
+    "transpile": "babel -s -d lib src",
+    "watch": "babel -w -s -d lib src"
   },
   "repository": "fmauNeko/node-displayotron",
   "keywords": [
@@ -24,6 +25,9 @@
     "url": "https://github.com/fmauNeko/node-displayotron/issues"
   },
   "homepage": "https://github.com/fmauNeko/node-displayotron#readme",
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "dependencies": {
     "debug": "^2.3.3",
     "i2c-bus": "^1.1.2",
@@ -32,14 +36,35 @@
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
-    "babel-preset-latest": "^6.16.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-env": "^1.0.2",
+    "babel-preset-stage-3": "^6.17.0",
     "jasmine": "^2.5.2",
     "jasmine-reporters": "^2.2.0",
-    "tap-diff": "^0.1.1"
+    "tap-diff": "^0.1.1",
+    "xo": "^0.17.1"
   },
   "babel": {
     "presets": [
-      "latest"
+      [
+        "env", {
+          "targets": {
+            "node": "6.0.0"
+          }
+        }
+      ],
+      "stage-3"
+    ],
+    "plugins": [
+      "add-module-exports"
+    ]
+  },
+  "xo": {
+    "esnext": true,
+    "space": 2,
+    "ignores": [
+      "lib",
+      "scripts"
     ]
   }
 }

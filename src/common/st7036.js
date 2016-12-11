@@ -4,7 +4,7 @@ import dbg from 'debug';
 
 const debug = dbg('dot:common:st7036');
 
-export class ST7036 {
+export default class ST7036 {
   constructor(registerSelectPin, resetPin = null, rows = 3, columns = 16, spiChipSelect = 0, instructionSetTemplate = 0b00111000) {
     this.registerSelectPin = registerSelectPin;
     this.resetPin = resetPin;
