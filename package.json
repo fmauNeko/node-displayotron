@@ -1,6 +1,6 @@
 {
   "name": "displayotron",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Native node library to use Pimoroni's Display-O-Tron HATs",
   "main": "index.js",
   "scripts": {
