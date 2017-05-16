@@ -42,7 +42,7 @@
     "jasmine": "^2.5.2",
     "jasmine-reporters": "^2.2.0",
     "tap-diff": "^0.1.1",
-    "xo": "^0.17.1"
+    "xo": "^0.18.2"
   },
   "babel": {
     "presets": [
